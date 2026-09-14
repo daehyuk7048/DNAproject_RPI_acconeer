@@ -1,0 +1,19 @@
+# --- 외부 라이브러리 클론 (별도 설치: README 참고) ---
+acconeer-python-exploration/
+lg/
+
+# --- Python 가상환경 / 캐시 ---
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- 실행 중 새로 생기는 로그는 logs/ 에 정리해서 커밋 ---
+/dispense_log_*.csv

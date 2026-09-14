@@ -1,0 +1,9 @@
+# PC 쪽 실행 의존성 (Python 3.10 기준, venv에 설치된 버전)
+acconeer-exptool==7.17.2
+PySide6==6.9.3
+pyqtgraph==0.13.7
+numpy==2.2.6
+
+# rgpio 는 PyPI 에 없으므로 lg 저장소에서 설치:
+#   git clone https://github.com/joan2937/lg.git && pip install ./lg/PY_RGPIO
+# (설치되는 버전: rgpio 0.2.2.0)
