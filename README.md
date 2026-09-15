@@ -90,12 +90,12 @@ flowchart LR
 | 구분 | 부품 | 역할 |
 |---|---|---|
 | 센서 | Acconeer **A121** + **XE121** 평가 모듈 | 60 GHz PCR 레이더, 플로트까지의 거리 측정 |
-| 컴퓨팅 | Raspberry Pi (3.3 V GPIO) | Exploration Server · rgpiod · Arduino 브리지 서버 실행 |
-| 컴퓨팅 | Arduino | 압력 레귤레이터용 PWM 출력 (D11) |
+| 컴퓨팅 | Raspberry Pi 5 (3.3 V GPIO) | Exploration Server · rgpiod · Arduino 브리지 서버 실행 |
+| 컴퓨팅 | Arduino (USB `/dev/ttyACM0`, 9600 baud) | 압력 레귤레이터용 PWM 출력 (D11) |
 | 공압 | Festo **VEAB-L-26-D2-Q4-V1-1R1** 비례 압력 레귤레이터 | 0-10 V 제어 신호에 비례해 출력 압력 조절 (0-200 kPa 범위로 사용) |
 | 공압 | 솔레노이드 밸브 | 토출 라인 개폐 |
 | 구동 | 릴레이 / MOSFET 모듈 | GPIO 3.3 V 로직으로 솔레노이드 코일 구동 |
-| 구동 | PWM → 0-10 V 변환 회로 | Arduino 5 V PWM을 VEAB 제어 전압으로 변환 |
+| 구동 | PWM → 0-10 V 변환 모듈 (W101) | Arduino D11 PWM(5 V)을 VEAB 제어 전압으로 변환 (`W101 IN ← D11`) |
 | 기구 | 투명 원통 탱크 (높이 100 mm, 내경 35 mm) + 플로트 | 유체 저장, 레이더 반사 표적 |
 
 ### 2.3 배선 / 핀 배치
@@ -130,7 +130,8 @@ PC의 GUI는 Raspberry Pi와 **세 개의 독립된 TCP 채널**로 통신합니
 P<핀번호>,<duty%>\n      예) P11,25.00\n   → D11에 duty 25 % PWM 출력
 ```
 
-- Raspberry Pi의 브리지 서버가 9999 포트로 받은 라인을 그대로 Arduino 시리얼로 넘깁니다.
+- Raspberry Pi의 브리지 서버(`rpi/rpi_bridge.py`)가 9999 포트로 받은 라인을 그대로 Arduino 시리얼(`/dev/ttyACM0`, 9600)로 넘깁니다. 접속 시 `READY\n`을 한 번 보내고, Arduino가 응답하면 그 한 줄을 되돌려 줍니다.
+- Arduino 스케치(`arduino/regulator_pwm/regulator_pwm.ino`)는 `serialEvent()`로 줄 단위 수신 → `P` 접두어 확인 → `analogWrite(pin, round(duty × 255 / 100))` 로 처리합니다.
 - 연결이 끊기면 `_send_arduino_command()`가 소켓을 닫고 한 번 재접속해서 재전송합니다.
 - 접속 대상은 환경변수로 바꿀 수 있습니다: `RGPIO_HOST`, `RGPIO_PORT` (기본 `192.168.28.227:8889`).
 
